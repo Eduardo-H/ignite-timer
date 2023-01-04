@@ -84,3 +84,16 @@ export const Status = styled.span<StatusProps>`
     background: ${(props) => props.theme[STATUS_COLORS[props.statusColor]]};
   }
 `
+
+export const EmptyCyclesContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 100%;
+
+  p {
+    font-size: 1rem;
+    color: ${(props) => props.theme['gray-400']};
+  }
+`

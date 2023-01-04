@@ -21,8 +21,8 @@ interface CycleContextData {
   activeCycleId: string | null
   amountSecondsPassed: number
   createNewCycle: (data: NewCycleFormData) => void
-  interruptCurrentCycle: () => void
   finishCurrentCycle: () => void
+  interruptCurrentCycle: () => void
   setSecondsPassed: (seconds: number) => void
 }
 
@@ -39,7 +39,7 @@ export function CyclesProvider({ children }: CyclesProviderProps) {
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
-  function handleCreateNewCycle(data: CreateCycleData) {
+  function createNewCycle(data: CreateCycleData) {
     const id = new Date().getTime().toString()
 
     const newCycle: Cycle = {
@@ -54,11 +54,11 @@ export function CyclesProvider({ children }: CyclesProviderProps) {
     setAmountSecondsPassed(0)
   }
 
-  function handleInterruptCycle() {
+  function finishCurrentCycle() {
     setCycles((state) =>
       state.map((cycle) => {
         if (cycle.id === activeCycleId) {
-          return { ...cycle, interruptedDate: new Date() }
+          return { ...cycle, finishedDate: new Date() }
         } else {
           return cycle
         }
@@ -68,11 +68,11 @@ export function CyclesProvider({ children }: CyclesProviderProps) {
     setActiveCycleId(null)
   }
 
-  function handleFinishCycle() {
+  function interruptCurrentCycle() {
     setCycles((state) =>
       state.map((cycle) => {
         if (cycle.id === activeCycleId) {
-          return { ...cycle, finishedDate: new Date() }
+          return { ...cycle, interruptedDate: new Date() }
         } else {
           return cycle
         }
@@ -93,9 +93,9 @@ export function CyclesProvider({ children }: CyclesProviderProps) {
         activeCycle,
         activeCycleId,
         amountSecondsPassed,
-        createNewCycle: handleCreateNewCycle,
-        finishCurrentCycle: handleFinishCycle,
-        interruptCurrentCycle: handleInterruptCycle,
+        createNewCycle,
+        finishCurrentCycle,
+        interruptCurrentCycle,
         setSecondsPassed,
       }}
     >

@@ -1,5 +1,19 @@
-import { createContext, ReactNode, useContext, useState } from 'react'
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useReducer,
+  useState,
+} from 'react'
+
 import { NewCycleFormData } from '../pages/Home'
+import {
+  ActionTypes,
+  createNewCycleAction,
+  finishCurrentCycleAction,
+  interruptCurrentCycleAction,
+} from '../reducers/cycles/actions'
+import { cyclesReducer } from '../reducers/cycles/reducer'
 
 interface CreateCycleData {
   task: string
@@ -33,10 +47,14 @@ interface CyclesProviderProps {
 const CyclesContext = createContext({} as CycleContextData)
 
 export function CyclesProvider({ children }: CyclesProviderProps) {
-  const [cycles, setCycles] = useState<Cycle[]>([])
-  const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+  const [cyclesState, dispatch] = useReducer(cyclesReducer, {
+    cycles: [],
+    activeCycleId: null,
+  })
+
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
 
+  const { cycles, activeCycleId } = cyclesState
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
   function createNewCycle(data: CreateCycleData) {
@@ -49,37 +67,16 @@ export function CyclesProvider({ children }: CyclesProviderProps) {
       startDate: new Date(),
     }
 
-    setCycles((state) => [...state, newCycle])
-    setActiveCycleId(id)
+    dispatch(createNewCycleAction(newCycle))
     setAmountSecondsPassed(0)
   }
 
-  function finishCurrentCycle() {
-    setCycles((state) =>
-      state.map((cycle) => {
-        if (cycle.id === activeCycleId) {
-          return { ...cycle, finishedDate: new Date() }
-        } else {
-          return cycle
-        }
-      }),
-    )
-
-    setActiveCycleId(null)
+  function interruptCurrentCycle() {
+    dispatch(interruptCurrentCycleAction())
   }
 
-  function interruptCurrentCycle() {
-    setCycles((state) =>
-      state.map((cycle) => {
-        if (cycle.id === activeCycleId) {
-          return { ...cycle, interruptedDate: new Date() }
-        } else {
-          return cycle
-        }
-      }),
-    )
-
-    setActiveCycleId(null)
+  function finishCurrentCycle() {
+    dispatch(finishCurrentCycleAction)
   }
 
   function setSecondsPassed(seconds: number) {
